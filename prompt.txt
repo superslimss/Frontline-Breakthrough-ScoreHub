@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前线突围活动分数统计表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .level-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #ee5a24, #ff6b6b);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .level-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            border-color: #ff6b6b;
+        }
+
+        .level-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .level-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .score-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .score-input:focus {
+            border-color: #ff6b6b;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+            transform: scale(1.02);
+        }
+
+        .score-input:hover {
+            border-color: #ff6b6b;
+            background: white;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .total-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: totalShine 2s infinite;
+        }
+
+        @keyframes totalShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .total-label {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .total-score {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .total-average {
+            font-size: 1rem;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.3s ease;
+        }
+
+        .btn:hover::before {
+            left: 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .statistics {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .score-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .total-score {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 160px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .score-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .score-updated {
+            animation: scoreUpdate 0.3s ease;
+        }
+
+        @keyframes scoreUpdate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <div class="header">
+            <h1>🎯 前线突围活动</h1>
+            <p>分数统计系统</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="score-grid">
+                <div class="level-card">
+                    <div class="level-title">
+                        <div class="level-icon">1</div>
+                        第一关卡
+                    </div>
+                    <input type="number" class="score-input" id="level1" placeholder="请输入第一关分数" min="0" step="1">
+                </div>
+                
+                <div class="level-card">
+                    <div class="level-title">
+                        <div class="level-icon">2</div>
+                        第二关卡
+                    </div>
+                    <input type="number" class="score-input" id="level2" placeholder="请输入第二关分数" min="0" step="1">
+                </div>
+                
+                <div class="level-card">
+                    <div class="level-title">
+                        <div class="level-icon">3</div>
+                        第三关卡
+                    </div>
+                    <input type="number" class="score-input" id="level3" placeholder="请输入第三关分数" min="0" step="1">
+                </div>
+                
+                <div class="level-card">
+                    <div class="level-title">
+                        <div class="level-icon">4</div>
+                        第四关卡
+                    </div>
+                    <input type="number" class="score-input" id="level4" placeholder="请输入第四关分数" min="0" step="1">
+                </div>
+                
+                <div class="level-card">
+                    <div class="level-title">
+                        <div class="level-icon">5</div>
+                        第五关卡
+                    </div>
+                    <input type="number" class="score-input" id="level5" placeholder="请输入第五关分数" min="0" step="1">
+                </div>
+            </div>
+            
+            <div class="total-section">
+                <div class="total-label">总分数</div>
+                <div class="total-score" id="totalScore">0</div>
+                <div class="total-average">平均分: <span id="averageScore">0</span></div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" onclick="clearAllScores()">
+                    🗑️ 清空所有分数
+                </button>
+                <button class="btn btn-secondary" onclick="fillRandomScores()">
+                    🎲 随机填充分数
+                </button>
+                <button class="btn btn-success" onclick="exportData()">
+                    📊 导出数据
+                </button>
+            </div>
+            
+            <div class="statistics">
+                <div class="stats-title">📈 详细统计</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="maxScore">0</div>
+                        <div class="stat-label">最高分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="minScore">0</div>
+                        <div class="stat-label">最低分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="completedLevels">0</div>
+                        <div class="stat-label">已完成关卡</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="scoreRange">0</div>
+                        <div class="stat-label">分数跨度</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 分数数据存储
+        let scores = {
+            level1: 0,
+            level2: 0,
+            level3: 0,
+            level4: 0,
+            level5: 0
+        };
+
+        // 初始化事件监听器
+        function initializeEventListeners() {
+            const inputs = document.querySelectorAll('.score-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', handleScoreInput);
+                input.addEventListener('focus', handleInputFocus);
+                input.addEventListener('blur', handleInputBlur);
+            });
+        }
+
+        // 处理分数输入
+        function handleScoreInput(event) {
+            const levelId = event.target.id;
+            const value = parseFloat(event.target.value) || 0;
+            
+            // 确保分数不为负数
+            if (value < 0) {
+                event.target.value = 0;
+                scores[levelId] = 0;
+            } else {
+                scores[levelId] = value;
+            }
+            
+            updateTotalScore();
+            updateStatistics();
+            
+            // 添加动画效果
+            const totalScoreElement = document.getElementById('totalScore');
+            totalScoreElement.classList.add('score-updated');
+            setTimeout(() => {
+                totalScoreElement.classList.remove('score-updated');
+            }, 300);
+        }
+
+        // 输入框获得焦点时的处理
+        function handleInputFocus(event) {
+            event.target.style.transform = 'scale(1.02)';
+        }
+
+        // 输入框失去焦点时的处理
+        function handleInputBlur(event) {
+            event.target.style.transform = 'scale(1)';
+        }
+
+        // 更新总分数
+        function updateTotalScore() {
+            const total = Object.values(scores).reduce((sum, score) => sum + score, 0);
+            const average = total / 5;
+            
+            document.getElementById('totalScore').textContent = total.toFixed(1);
+            document.getElementById('averageScore').textContent = average.toFixed(1);
+        }
+
+        // 更新统计信息
+        function updateStatistics() {
+            const scoreValues = Object.values(scores).filter(score => score > 0);
+            const allScores = Object.values(scores);
+            
+            // 最高分
+            const maxScore = Math.max(...allScores);
+            document.getElementById('maxScore').textContent = maxScore.toFixed(1);
+            
+            // 最低分（只考虑大于0的分数）
+            const minScore = scoreValues.length > 0 ? Math.min(...scoreValues) : 0;
+            document.getElementById('minScore').textContent = minScore.toFixed(1);
+            
+            // 已完成关卡数
+            const completedLevels = scoreValues.length;
+            document.getElementById('completedLevels').textContent = completedLevels;
+            
+            // 分数跨度
+            const scoreRange = maxScore - (minScore > 0 ? minScore : maxScore);
+            document.getElementById('scoreRange').textContent = scoreRange.toFixed(1);
+        }
+
+        // 清空所有分数
+        function clearAllScores() {
+            console.log('清空按钮被点击');
+            if (confirm('确定要清空所有分数吗？')) {
+                Object.keys(scores).forEach(key => {
+                    scores[key] = 0;
+                    const input = document.getElementById(key);
+                    if (input) {
+                        input.value = '';
+                    }
+                });
+                updateTotalScore();
+                updateStatistics();
+                
+                // 添加清空动画效果
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.style.animation = 'fadeIn 0.5s ease-in';
+                }
+                alert('所有分数已清空！');
+            }
+        }
+
+        // 随机填充分数
+        function fillRandomScores() {
+            console.log('随机填充按钮被点击');
+            if (confirm('确定要用随机分数填充所有关卡吗？')) {
+                Object.keys(scores).forEach(key => {
+                    const randomScore = Math.floor(Math.random() * 1000) + 100; // 100-1099的随机分数
+                    scores[key] = randomScore;
+                    const input = document.getElementById(key);
+                    if (input) {
+                        input.value = randomScore;
+                    }
+                });
+                updateTotalScore();
+                updateStatistics();
+                alert('随机分数填充完成！');
+            }
+        }
+
+        // 导出数据
+        function exportData() {
+            console.log('导出按钮被点击');
+            try {
+                const total = Object.values(scores).reduce((sum, score) => sum + score, 0);
+                const data = {
+                    关卡分数: {
+                        第一关: scores.level1,
+                        第二关: scores.level2,
+                        第三关: scores.level3,
+                        第四关: scores.level4,
+                        第五关: scores.level5
+                    },
+                    总分: total,
+                    平均分: (total / 5).toFixed(2),
+                    导出时间: new Date().toLocaleString('zh-CN')
+                };
+                
+                const dataStr = JSON.stringify(data, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `前线突围分数统计_${new Date().toISOString().split('T')[0]}.json`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                alert('数据导出成功！');
+            } catch (error) {
+                console.error('导出数据时出错:', error);
+                alert('数据导出失败，请重试！');
+            }
+        }
+
+        // 从本地存储加载数据（已移除localStorage功能）
+        function loadFromLocalStorage() {
+            // localStorage功能已移除，避免沙盒环境错误
+            console.log('localStorage功能已禁用');
+        }
+
+        // 保存到本地存储（已移除localStorage功能）
+        function saveToLocalStorage() {
+            // localStorage功能已移除，避免沙盒环境错误
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始初始化');
+            
+            // 确保函数在全局作用域可用
+            window.clearAllScores = clearAllScores;
+            window.fillRandomScores = fillRandomScores;
+            window.exportData = exportData;
+            
+            initializeEventListeners();
+            updateTotalScore();
+            updateStatistics();
+            
+            // 验证按钮是否存在
+            const buttons = document.querySelectorAll('.btn');
+            console.log('找到按钮数量:', buttons.length);
+            buttons.forEach((btn, index) => {
+                console.log(`按钮 ${index + 1}:`, btn.textContent.trim());
+            });
+            
+            // 添加键盘快捷键支持
+            document.addEventListener('keydown', function(event) {
+                if (event.ctrlKey) {
+                    switch(event.key) {
+                        case 'r':
+                            event.preventDefault();
+                            fillRandomScores();
+                            break;
+                        case 'd':
+                            event.preventDefault();
+                            clearAllScores();
+                            break;
+                        case 's':
+                            event.preventDefault();
+                            exportData();
+                            break;
+                    }
+                }
+            });
+        });
+
+        // 页面卸载前不再需要保存数据
+        // window.addEventListener('beforeunload', saveToLocalStorage);
+    </script>
+</body>
+</html>
+
+
+把代码更换成我上面写的这些， 并且解决清空按钮被点击随机填充按钮被点击导出按钮被点击  点击这三个按钮都没有反应的问题
