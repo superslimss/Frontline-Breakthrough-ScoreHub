@@ -388,11 +388,11 @@
         .modal-content {
             position: relative;
             background-color: #fff;
-            margin: 5% auto;
+            margin: 3% auto;
             padding: 20px;
-            width: 90%;
-            max-width: 800px;
-            height: 80vh;
+            width: 95%;
+            max-width: 1200px;
+            height: 90vh;
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             animation: modalFadeIn 0.3s;
@@ -441,6 +441,60 @@
         #historyChart {
             width: 100%;
             height: 100%;
+        }
+
+        /* 游戏攻略板块列表容器样式 */
+        #guideSectionList {
+            display: flex !important;
+            flex-direction: row !important; /* 横向排列 */
+            justify-content: center; /* 水平居中 */
+            gap: 20px; /* 添加间距 */
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* 保持允许换行 */
+            padding: 20px 0; /* 保持列表上下内边距 */
+        }
+
+        /* 游戏攻略板块按钮卡片样式 */
+        #guideSectionList .guide-section-link {
+            width: 960px; /* 宽度增加六倍 */
+            height: 107px; /* 高度缩短三分之一 */
+            text-align: center; /* 文本居中 */
+            font-size: 1.1rem;
+            padding: 15px; /* 内部填充 */
+            box-sizing: border-box; /* 确保padding不影响宽高计算 */
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            gap: 15px; /* 图标和文字之间的间距 */
+        }
+
+        #guideSectionList .guide-section-link span {
+            display: inline-block; /* 改为行内块级元素 */
+            font-size: 2.5rem; /* 稍微调小图标大小 */
+            margin: 0; /* 移除底部间距 */
+        }
+
+        /* 英雄装备内容图片的样式 */
+        #heroEquipmentContent img {
+            width: calc(33.33% - 10px); /* 每张图片宽度约占三分之一，留出间距 */
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            object-fit: cover;
+        }
+
+        /* 制作人弹窗内容样式 */
+        #producerModal .modal-content {
+            max-width: 500px; /* 调整最大宽度 */
+            /* 如果需要，可以调整高度或其他尺寸属性 */
+        }
+
+        /* 建筑升级攻略文字标题样式 */
+        #buildingUpgradeText h4 {
+            font-size: 1.4em; /* 调整标题字体大小 */
+            margin-top: 20px; /* 在标题上方增加一些间距 */
+            margin-bottom: 10px; /* 在标题下方增加一些间距 */
+            color: #2c3e50; /* 可以调整标题颜色 */
         }
     </style>
     <!-- 添加 Chart.js 库 -->
@@ -508,6 +562,7 @@
                 <button class="btn btn-secondary" id="randomBtn">🎲 随机填充分数</button>
                 <button class="btn btn-success" id="exportBtn">📊 导出数据</button>
                 <button class="btn btn-primary" id="teachBtn">🌏 世界第一前线突围教学</button>
+                <button class="btn btn-info" id="guideBtn">📖 游戏攻略</button>
             </div>
             
             <div class="statistics">
@@ -549,12 +604,195 @@
 
     <!-- 制作人弹窗 -->
     <div id="producerModal" class="modal">
-        <div class="modal-content" style="max-width: 350px; text-align: center;">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 style="margin:0;font-size:1.2rem;">制作人</h2>
-                <span class="close-btn" id="closeProducerModal" style="font-size:24px;cursor:pointer;">&times;</span>
+                <h2>制作人</h2>
+                <span class="close-btn" onclick="document.getElementById('producerModal').style.display='none'">&times;</span>
             </div>
-            <div class="modal-body" style="font-size:1.3rem;padding:30px 0;">1484- 米嘉</div>
+            <div class="modal-body" style="text-align: center;">
+                <p>1484 - 米嘉</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏攻略弹窗 -->
+    <div id="guideModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="guideModalTitle">游戏攻略</h2>
+                <span class="close-btn" onclick="document.getElementById('guideModal').style.display='none'">&times;</span>
+            </div>
+            <div class="modal-body" id="guideModalBody" style="overflow-y: auto;">
+                <!-- 攻略板块列表 -->
+                <div id="guideSectionList">
+                    <!-- 英雄装备板块卡片 -->
+                    <button class="btn btn-secondary guide-section-link" onclick="showGuideContent('heroEquipmentModal')">
+                         <span>🛡️</span> 英雄装备
+                    </button>
+
+                    <!-- 商店道具板块卡片 -->
+                    <button class="btn btn-secondary guide-section-link" onclick="showGuideContent('shopItemsModal')">
+                         <span>💰</span> 商店道具
+                    </button>
+
+                    <!-- 新增 同盟对决板块卡片 -->
+                    <button class="btn btn-secondary guide-section-link" onclick="showGuideContent('allianceShowdownModal')">
+                         <span>⚔️</span> 同盟对决
+                    </button>
+
+                    <!-- 新增 建筑升级板块卡片 -->
+                    <button class="btn btn-secondary guide-section-link" onclick="showGuideContent('buildingUpgradeModal')">
+                         <span>🏗️</span> 建筑升级
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 英雄装备攻略弹窗 -->
+    <div id="heroEquipmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>英雄装备攻略</h2>
+                <span class="close-btn" onclick="document.getElementById('heroEquipmentModal').style.display='none'">&times;</span>
+            </div>
+            <div class="modal-body" style="overflow-y: auto;">
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+                    <img src="images/guide/hero-equipment/image1.jpg" alt="攻略图片 1" style="width: calc(33.33% - 10px); height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: cover;">
+                    <img src="images/guide/hero-equipment/image2.jpg" alt="攻略图片 2" style="width: calc(33.33% - 10px); height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: cover;">
+                    <img src="images/guide/hero-equipment/image3.jpg" alt="攻略图片 3" style="width: calc(33.33% - 10px); height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: cover;">
+                    <img src="images/guide/hero-equipment/image4.jpg" alt="攻略图片 4" style="width: calc(33.33% - 10px); height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: cover;">
+                    <img src="images/guide/hero-equipment/image5.jpg" alt="攻略图片 5" style="width: calc(33.33% - 10px); height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商店道具攻略弹窗 -->
+    <div id="shopItemsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>商店道具攻略</h2>
+                <span class="close-btn" onclick="document.getElementById('shopItemsModal').style.display='none'">&times;</span>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; text-align: center;">
+                <img src="images/guide/shop-items/shop_items.jpg" alt="商店道具攻略" style="max-width: 50%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增 同盟对决攻略弹窗 -->
+    <div id="allianceShowdownModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>同盟对决攻略</h2>
+                <span class="close-btn" onclick="document.getElementById('allianceShowdownModal').style.display='none'">&times;</span>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; text-align: center;">
+                <img src="images/guide/alliance-showdown/alliance_showdown.jpg" alt="同盟对决攻略" style="max-width: 50%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增 建筑升级攻略弹窗 -->
+    <div id="buildingUpgradeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>建筑升级攻略</h2>
+                <span class="close-btn" onclick="document.getElementById('buildingUpgradeModal').style.display='none'">&times;</span>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; text-align: center;">
+                <!-- 建筑升级文字内容 -->
+                <div id="buildingUpgradeText" style="margin-bottom: 20px; text-align: left; color: #333; padding: 10px;">
+                    <h4>1、"速升"t9</h4>
+                    <p style="margin-bottom: 15px;">这个游戏初期的核心思路是尽快将基地等级升到27，拿到t9。由于零氪拿到t9需要一段时间（反正具体到本人，我当时在第5-第7的公会，花了70来天才拿到t9），所以零氪真正意义上的"速升"我认为是不可能的，而是要有几个"休息点"。当时我一共有六个休息点：</p>
+
+                    <h4>休息点1：速升hq 14</h4>
+                    <p style="margin-bottom: 15px;">升到14级后，具备以下条件后进行下一阶段的速升。</p>
+                    <ul style="margin-bottom: 15px;">
+                        <li>I、将校场填满士兵，且让士兵全部是最新等级。</li>
+                        <li>II、将两个校场（或至少一个校场）升到14级</li>
+                    </ul>
+
+                    <h4>休息点2：速升hq 15</h4>
+                    <p style="margin-bottom: 15px;">在这里放慢节奏，好好休息会儿，将落后的基础设施与建筑好好地升级一下。具备以下条件后开启下一阶段的rush。</p>
+                    <ul style="margin-bottom: 15px;">
+                        <li>I、兵营：一个lvl15，一个lvl14</li>
+                        <li>II、材料工厂：一个lvl15，其它lvl13</li>
+                        <li>III、冶炼厂：同上</li>
+                        <li>IV、农场：一个lvl15，两个lvl14，其它lvl13</li>
+                        <li>V、铁矿：同上</li>
+                        <li>VI、金矿：两个lvl15，一个lvl14（或者是一个lvl15，两个lvl14？甚至也许还有lvl13？记不清了）</li>
+                        <li>VII、校场：一个lvl15，一个lvl13</li>
+                    </ul>
+
+                    <h4>3、速升hq 17</h4>
+                    <p style="margin-bottom: 15px;">在满足条件后可以将基地从15级速升到17级（前面忘说了，所谓速升就是其它建筑都不管，只点基地升级需要的建筑）。之所以停在这里是因为基地升到17后能解锁新一级的兵种。</p>
+                    <p style="margin-bottom: 15px;">具备以下条件后进行下一阶段的速升：</p>
+                    <ul style="margin-bottom: 15px;">
+                        <li>I、材料工厂：一个lvl17，其它lvl15</li>
+                        <li>II、冶炼厂：同上</li>
+                        <li>III、训练基地：全部lvl 17</li>
+                        <li>IV、农场：一个lvl17，其它lvl 15</li>
+                        <li>V、铁矿：同上</li>
+                        <li>VI、金矿：一个lvl 17，一个lvl 16，其它lvl 15</li>
+                        <li>VII、校场：一个lvl 17，一个lvl 15</li>
+                        <li>VIII、兵营：两个lvl 17，一个lvl 14，一个lvl 10</li>
+                    </ul>
+
+                    <h4>4、速升hq 20</h4>
+                    <p style="margin-bottom: 15px;">一个很大的休息点。我当时之所以暂停点放在这里是因为基地升到20级后会多给一个校场。</p>
+                    <p style="margin-bottom: 15px;">可以在基地20级这位置好好拉一下其它的建筑，然后在具备以下条件后进行下一阶段的速升：</p>
+                    <ul style="margin-bottom: 15px;">
+                        <li>I、材料工厂：一个lvl 18，其它lvl 17</li>
+                        <li>II、冶炼工厂：同上</li>
+                        <li>III、训练基地：全部lvl 20</li>
+                        <li>IV、农场：一个lvl17，一个lvl16，其它lvl15</li>
+                        <li>V、铁矿：一个lvl17，一个lvl16，其它lvl15</li>
+                        <li>VI、金矿：一个lvl18，一个lvl17，其它lvl16</li>
+                        <li>VII、校场：一个lvl20，一个lvl17，一个lvl15</li>
+                        <li>VIII、兵营：一个lvl20，两个lvl17，一个lvl14</li>
+                    </ul>
+
+                    <h4>5、"速升"hq 24</h4>
+                    <p style="margin-bottom: 15px;">从基地20级开始，升级需要的资源和加速都开始急剧增加。所以这里的"速升"，指的是「升级完必备建筑*后就开始升级hq」（什么是必备建筑见这一楼结尾会给定义），而不是「不惜一切代价、尽快用各种加速升级到lvl24」。</p>
+                    <p style="margin-bottom: 15px;">之所以选择「基地升到24级」为暂停点，是因为24级能解锁新一级的兵种t8。另外我推荐在速升24的过程中，可以将一个17级的兵营升到20级。</p>
+                    <p style="margin-bottom: 15px;">到达24级后可以休息一下，然后在具备以下条件后进行下一阶段的rush：</p>
+                    <ul style="margin-bottom: 15px;">
+                        <li>I、材料工厂：两个lvl19，其它lvl18</li>
+                        <li>II、冶炼厂：同上</li>
+                        <li>III、训练中心：全部lvl22</li>
+                    </ul>
+                    <p style="margin-bottom: 15px;">我当时训练中心其实是「2个lvl 23，剩余的lvl 22」。但我升多了，全部停在22级足够。</p>
+                    <ul style="margin-bottom: 15px;">
+                        <li>IV、校场：一个lvl21，一个lvl19，一个lvl18</li>
+                        <li>V、兵营：一个lvl24，一个lvl20，两个lvl17</li>
+                    </ul>
+                    <p style="margin-bottom: 15px;">——————————————————————————————</p>
+                    <p style="margin-bottom: 15px;">*必备建筑：每升一个基地等级，除了必须的升级建筑（比如科技中心）外，我认为还有两个必须升的建筑，一个是「1个训练中心」，另一个是「1个兵营」。不过从基地23级开始，必备建筑只剩一个，那就是「1个兵营」。训练中心不用升的太高，22级够用了</p>
+
+                    <h4>6、"速升"到hq 27，结束</h4>
+                    <p style="margin-bottom: 15px;">终于来到了"速升"t9的最后一个阶段。24升27需要的资源和加速比起20升24又更多了很多，许多零氪玩家（包括我自己）都是在这个阶段开始真正出现资源和加速短缺。虽然说是"速升"，但更多是一个努力方向而不是字面意义上的"速升"。所以完全不用急，慢慢来。</p>
+                    <p style="margin-bottom: 15px;">这个阶段的"速升"有两点要补充一下：</p>
+                    <ul style="margin-bottom: 15px;">
+                        <li>I、前面的几个阶段我有个习惯是每升一个基地等级都会把「1个兵营」同步升到最高等级。但24升27我建议先不升（也就是说基地27之前24级的兵营基本不升），先集中精力将基地升到27级。因为到了27级不管是资源箱还是隐秘任务都能给更多资源，而这反过来可以让兵营更快升到27级，拿到t9。</li>
+                        <li>II、在升hq 25前，我将医院升到了21级；在升hq 26前，我将城墙升到了23级。之所以这样是避免基地等级卡太久。</li>
+                    </ul>
+
+                    <h4>7、t9——后续&基地30级</h4>
+                    <p style="margin-bottom: 15px;">恭喜，拿到t9意味着终于走出了新手村，不用再这么频繁的升基地了。基地升到27级后我认为不用急着升30级基地，可以先将科技和一队战力提一提，然后再慢慢升30。至于科技升到哪个地步后要开始偏重于升30？个人认为是：「当升科技需要（频繁地）动用紫色金币箱开始」。</p>
+                    <p style="margin-bottom: 15px;">顺便写一下我在基地升到30级时各建筑物的最终等级：</p>
+                    <ul style="margin-bottom: 15px;">
+                        <li>I、材料工厂：全部升到lvl19</li>
+                        <li>II、冶炼厂：全部升到lvl21</li>
+                        <li>III、训练中心/农场/铁矿/金矿：保持不变（具体多少级看上面的4和5）</li>
+                    </ul>
+                </div>
+                <!-- 建筑升级图片 -->
+                <img src="images/guide/building-upgrade/building_upgrade.jpg" alt="建筑升级攻略" style="max-width: 50%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain; display: block; margin: 0 auto;">
+                <!-- 感谢信息 -->
+                <p style="text-align: center; font-size: 0.9em; color: #666; margin-top: 10px;">感谢贴吧大佬-鳅的资料</p>
+            </div>
         </div>
     </div>
 

@@ -379,8 +379,18 @@ function initializeEventListeners() {
     // 点击弹窗外部关闭
     window.addEventListener('click', (event) => {
         const modal = document.getElementById('historyModal');
+        const producerModal = document.getElementById('producerModal'); // 获取制作人弹窗
+        const guideModal = document.getElementById('guideModal'); // 获取游戏攻略弹窗
         if (event.target === modal) {
             closeHistoryModal();
+        }
+        // 新增：点击制作人弹窗外部关闭
+        if (event.target === producerModal) {
+            producerModal.style.display = 'none';
+        }
+        // 新增：点击游戏攻略弹窗外部关闭
+        if (event.target === guideModal) {
+            guideModal.style.display = 'none';
         }
     });
 
@@ -388,6 +398,7 @@ function initializeEventListeners() {
     const clearBtn = document.getElementById('clearBtn');
     const randomBtn = document.getElementById('randomBtn');
     const exportBtn = document.getElementById('exportBtn');
+    const guideBtn = document.getElementById('guideBtn'); // 新增：游戏攻略按钮
 
     if (clearBtn) {
         console.log('绑定清空按钮事件');
@@ -408,6 +419,83 @@ function initializeEventListeners() {
         exportBtn.addEventListener('click', exportData);
     } else {
         console.error('找不到导出按钮');
+    }
+
+    // 新增游戏攻略按钮事件
+    if (guideBtn) {
+        console.log('绑定游戏攻略按钮事件');
+        guideBtn.addEventListener('click', function() {
+            const guideModal = document.getElementById('guideModal');
+            const guideSectionList = document.getElementById('guideSectionList');
+            const heroEquipmentContent = document.getElementById('heroEquipmentContent');
+            const shopItemsContent = document.getElementById('shopItemsContent'); // 获取商店道具内容div
+            const guideModalTitle = document.getElementById('guideModalTitle');
+            if (guideModal) {
+                guideModal.style.display = 'block';
+                // 默认显示板块列表
+                if (guideSectionList) guideSectionList.style.display = 'block';
+                if (heroEquipmentContent) heroEquipmentContent.style.display = 'none';
+                if (shopItemsContent) shopItemsContent.style.display = 'none'; // 默认隐藏商店道具内容
+            }
+        });
+    }
+
+    // 新增：游戏攻略板块链接点击事件
+    const guideSectionLinks = document.querySelectorAll('.guide-section-link');
+    guideSectionLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            const section = this.dataset.section;
+            const guideSectionList = document.getElementById('guideSectionList');
+            const heroEquipmentContent = document.getElementById('heroEquipmentContent');
+            const shopItemsContent = document.getElementById('shopItemsContent'); // 获取商店道具内容div
+            const guideModalTitle = document.getElementById('guideModalTitle');
+
+            if (section === 'hero-equipment') {
+                if (guideSectionList) guideSectionList.style.display = 'none';
+                if (heroEquipmentContent) heroEquipmentContent.style.display = 'block';
+                if (shopItemsContent) shopItemsContent.style.display = 'none'; // 隐藏商店道具内容
+                if (guideModalTitle) guideModalTitle.textContent = '英雄装备'; // 更新弹窗标题
+            } else if (section === 'shop-items') { // 新增：商店道具板块点击逻辑
+                if (guideSectionList) guideSectionList.style.display = 'none';
+                if (heroEquipmentContent) heroEquipmentContent.style.display = 'none'; // 隐藏英雄装备内容
+                if (shopItemsContent) shopItemsContent.style.display = 'block';
+                if (guideModalTitle) guideModalTitle.textContent = '商店道具'; // 更新弹窗标题
+            }
+            // 未来可以在这里添加其他板块的逻辑
+        });
+    });
+
+    // 新增：游戏攻略返回按钮点击事件
+    const guideBackBtn = document.getElementById('guideBackBtn'); // 英雄装备返回按钮
+    const shopItemsBackBtn = document.getElementById('shopItemsBackBtn'); // 商店道具返回按钮
+
+    if (guideBackBtn) {
+        guideBackBtn.addEventListener('click', function() {
+            const guideSectionList = document.getElementById('guideSectionList');
+            const heroEquipmentContent = document.getElementById('heroEquipmentContent');
+            const shopItemsContent = document.getElementById('shopItemsContent'); // 获取商店道具内容div
+            const guideModalTitle = document.getElementById('guideModalTitle');
+
+            if (guideSectionList) guideSectionList.style.display = 'block';
+            if (heroEquipmentContent) heroEquipmentContent.style.display = 'none';
+            if (shopItemsContent) shopItemsContent.style.display = 'none'; // 隐藏商店道具内容
+            if (guideModalTitle) guideModalTitle.textContent = '游戏攻略'; // 恢复弹窗标题
+        });
+    }
+
+    // 新增：商店道具返回按钮点击事件
+    if (shopItemsBackBtn) {
+        shopItemsBackBtn.addEventListener('click', function() {
+            const guideSectionList = document.getElementById('guideSectionList');
+            const heroEquipmentContent = document.getElementById('heroEquipmentContent'); // 获取英雄装备内容div
+            const shopItemsContent = document.getElementById('shopItemsContent');
+            const guideModalTitle = document.getElementById('guideModalTitle');
+
+            if (guideSectionList) guideSectionList.style.display = 'block';
+            if (heroEquipmentContent) heroEquipmentContent.style.display = 'none'; // 隐藏英雄装备内容
+            if (shopItemsContent) shopItemsContent.style.display = 'none';
+            if (guideModalTitle) guideModalTitle.textContent = '游戏攻略'; // 恢复弹窗标题
+        });
     }
 
     // 新增教学按钮事件
@@ -654,6 +742,14 @@ function rebuildTotalHistoryFromAllLevels() {
     localStorage.setItem('frontlineTotalHistory', JSON.stringify(totalHistory));
 }
 
+// 显示攻略内容弹窗
+function showGuideContent(modalId) {
+    // 关闭游戏攻略主弹窗
+    document.getElementById('guideModal').style.display = 'none';
+    // 显示对应的内容弹窗
+    document.getElementById(modalId).style.display = 'block';
+}
+
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
     console.log('页面加载完成，开始初始化');
@@ -668,25 +764,19 @@ document.addEventListener('DOMContentLoaded', function() {
         totalScoreCard.addEventListener('click', showTotalHistoryChart);
     }
 
-    // ====== 制作人弹窗绑定逻辑 ======
+    // ====== 制作人弹窗绑定逻辑 ====== // 移除错误的关闭按钮绑定，保留打开按钮绑定和外部点击关闭
     const producerBtn = document.getElementById('producerBtn');
     const producerModal = document.getElementById('producerModal');
-    const closeProducerModal = document.getElementById('closeProducerModal');
-    if (producerBtn && producerModal && closeProducerModal) {
+
+    // 确保制作人按钮的点击事件能正确绑定
+    if (producerBtn && producerModal) {
         producerBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             producerModal.style.display = 'block';
         });
-        closeProducerModal.addEventListener('click', function(e) {
-            e.stopPropagation();
-            producerModal.style.display = 'none';
-        });
-        // 只关闭制作人弹窗
-        producerModal.addEventListener('click', function(event) {
-            if (event.target === producerModal) {
-                producerModal.style.display = 'none';
-            }
-        });
     }
+
+    // 制作人弹窗的关闭通过内联 onclick 和 window 外部点击处理
+
     // ====== END 制作人弹窗绑定 ======
-}); 
+});
