@@ -378,18 +378,20 @@ function initializeEventListeners() {
 
     // 点击弹窗外部关闭
     window.addEventListener('click', (event) => {
-        const modal = document.getElementById('historyModal');
-        const producerModal = document.getElementById('producerModal'); // 获取制作人弹窗
-        const guideModal = document.getElementById('guideModal'); // 获取游戏攻略弹窗
-        if (event.target === modal) {
+        const modal = document.getElementById('historyModal'); // 历史记录弹窗
+        const producerModal = document.getElementById('producerModal'); // 制作人弹窗
+        const guideModal = document.getElementById('guideModal'); // 游戏攻略主弹窗
+        const clickedElement = event.target; // 获取点击的元素
+
+        // 如果点击的是攻略内容弹窗的外部
+        if (clickedElement.classList.contains('guide-content-modal')) {
+            clickedElement.style.display = 'none'; // 隐藏当前内容弹窗
+            guideModal.style.display = 'block'; // 显示游戏攻略主弹窗
+        } else if (clickedElement === modal) { // 如果点击的是历史记录弹窗外部
             closeHistoryModal();
-        }
-        // 新增：点击制作人弹窗外部关闭
-        if (event.target === producerModal) {
+        } else if (clickedElement === producerModal) { // 如果点击的是制作人弹窗外部
             producerModal.style.display = 'none';
-        }
-        // 新增：点击游戏攻略弹窗外部关闭
-        if (event.target === guideModal) {
+        } else if (clickedElement === guideModal) { // 如果点击的是游戏攻略主弹窗外部
             guideModal.style.display = 'none';
         }
     });
