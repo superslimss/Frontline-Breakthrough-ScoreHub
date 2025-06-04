@@ -93,6 +93,18 @@ function addHistoryRecord(levelId, score) {
     addTotalHistory(); // 新增：同步记录总分历史
 }
 
+// ======= 优化Y轴最大值和步长算法 =======
+function getNiceStepAndMax(val) {
+    if (val <= 100) return { step: 20, max: 100 };
+    if (val <= 500) return { step: 50, max: Math.ceil(val / 50) * 50 };
+    if (val <= 1000) return { step: 100, max: Math.ceil(val / 100) * 100 };
+    if (val <= 2500) return { step: 250, max: Math.ceil(val / 250) * 250 };
+    if (val <= 5000) return { step: 500, max: Math.ceil(val / 500) * 500 };
+    if (val <= 10000) return { step: 1000, max: Math.ceil(val / 1000) * 1000 };
+    if (val <= 20000) return { step: 2000, max: Math.ceil(val / 2000) * 2000 };
+    return { step: 5000, max: Math.ceil(val / 5000) * 5000 };
+}
+
 // 显示历史记录图表
 function showHistoryChart(levelId) {
     const modal = document.getElementById('historyModal');
@@ -118,19 +130,8 @@ function showHistoryChart(levelId) {
     const scoreRange = maxScore - minScore;
     const padding = scoreRange * 0.2; // 上下各留20%的padding
 
-    // 计算整齐的Y轴最大值，并在基础上再加两档
-    function getNiceMax(val) {
-        if (val <= 100) return 100;
-        if (val <= 900) return Math.ceil(val / 100) * 100;
-        return Math.ceil(val / 200) * 200;
-    }
-    let niceMax = getNiceMax(maxScore);
-    // 计算档位
-    let step = 100;
-    if (niceMax <= 100) step = 20;
-    else if (niceMax <= 900) step = 100;
-    else step = 200;
-    // Y轴最大值为整齐刻度+两档
+    // 优化后的整齐Y轴最大值和步长
+    let { step, max: niceMax } = getNiceStepAndMax(maxScore);
     niceMax = niceMax + 2 * step;
     
     // 创建新图表
@@ -267,17 +268,8 @@ function showTotalHistoryChart() {
     const minScore = Math.min(...totals);
     const scoreRange = maxScore - minScore;
     const padding = scoreRange * 0.2;
-    // 整齐刻度+两档
-    function getNiceMax(val) {
-        if (val <= 100) return 100;
-        if (val <= 900) return Math.ceil(val / 100) * 100;
-        return Math.ceil(val / 200) * 200;
-    }
-    let niceMax = getNiceMax(maxScore);
-    let step = 100;
-    if (niceMax <= 100) step = 20;
-    else if (niceMax <= 900) step = 100;
-    else step = 200;
+    // 优化后的整齐Y轴最大值和步长
+    let { step, max: niceMax } = getNiceStepAndMax(maxScore);
     niceMax = niceMax + 2 * step;
     // 创建新图表（不允许右键删除）
     historyChart = new Chart(ctx, {
